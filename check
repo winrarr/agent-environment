@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+set -u
+
+repo_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+codex_home="${CODEX_HOME:-${HOME:?HOME is required}/.codex}"
+claude_home="${CLAUDE_HOME:-${HOME:?HOME is required}/.claude}"
+errors=0
+
+error() {
+  printf 'check: %s\n' "$1" >&2
+  errors=$((errors + 1))
+}
+
+check_link() {
+  local expected="$1"
+  local link="$2"
+  local actual
+
+  if [[ ! -L "$link" ]]; then
+    error "expected a symlink at $link"
+    return
+  fi
+
+  actual="$(readlink -f -- "$link" 2>/dev/null || true)"
+  if [[ "$actual" != "$expected" ]]; then
+    error "$link resolves to ${actual:-nowhere}, expected $expected"
+  fi
+}
+
+check_skill() {
+  local skill_dir="$1"
+  local skill_name
+  local declared_name
+  local entry
+
+  skill_name="$(basename -- "$skill_dir")"
+
+  if [[ ! -s "$skill_dir/SKILL.md" ]]; then
+    error "missing or empty $skill_dir/SKILL.md"
+    return
+  fi
+
+  if [[ "$(head -n 1 -- "$skill_dir/SKILL.md")" != "---" ]]; then
+    error "$skill_dir/SKILL.md does not begin with YAML frontmatter"
+  fi
+
+  declared_name="$(sed -n 's/^name:[[:space:]]*//p' "$skill_dir/SKILL.md" | head -n 1)"
+  if [[ "$declared_name" != "$skill_name" ]]; then
+    error "$skill_dir/SKILL.md declares name '$declared_name', expected '$skill_name'"
+  fi
+
+  if ! grep -q '^description:[[:space:]]*[^[:space:]]' "$skill_dir/SKILL.md"; then
+    error "$skill_dir/SKILL.md has no description"
+  fi
+
+  check_link "$skill_dir" "$codex_home/skills/$skill_name"
+
+  for entry in SKILL.md references scripts assets; do
+    if [[ -e "$skill_dir/$entry" ]]; then
+      check_link "$skill_dir/$entry" "$claude_home/skills/$skill_name/$entry"
+    fi
+  done
+}
+
+if [[ ! -s "$repo_dir/INSTRUCTIONS.md" ]]; then
+  error "missing or empty $repo_dir/INSTRUCTIONS.md"
+fi
+
+check_link "$repo_dir/INSTRUCTIONS.md" "$codex_home/AGENTS.md"
+check_link "$repo_dir/INSTRUCTIONS.md" "$claude_home/CLAUDE.md"
+
+while IFS= read -r broken_link; do
+  error "broken repository symlink: $broken_link"
+done < <(find "$repo_dir" -xtype l -print)
+
+shopt -s nullglob
+skill_dirs=("$repo_dir"/skills/*)
+if (( ${#skill_dirs[@]} == 0 )); then
+  error "no skills found in $repo_dir/skills"
+else
+  for skill_dir in "${skill_dirs[@]}"; do
+    [[ -d "$skill_dir" ]] || continue
+    check_skill "$skill_dir"
+  done
+fi
+
+if (( errors > 0 )); then
+  printf 'Found %d error(s).\n' "$errors" >&2
+  exit 1
+fi
+
+printf 'Agent environment is valid and installed.\n'
