@@ -13,6 +13,7 @@ These are common instructions for agents across all scenarios
 - Hold engineering work to a high standard. If something clearly looks wrong, fix it when safely within scope; otherwise mention the material issue.
 - When the user asks for implementation, carry it through implementation, verification, and handoff. Make reasonable low-risk assumptions; ask for guidance only when ambiguity materially changes scope or risk. Surface disagreements and explain them.
 - When a breaking change is intentional, clean up obsolete adjacent code instead of preserving compatibility solely to avoid churn.
+- After changing the global agent instructions or personally maintained skills in `/home/rkth/agents`, validate the changes, commit them, and push the current branch unless the user explicitly asks not to.
 
 ## Code Taste
 

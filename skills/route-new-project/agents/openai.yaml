@@ -1,0 +1,4 @@
+interface:
+  display_name: "Route New Project"
+  short_description: "Choose the correct home for a new project."
+  default_prompt: "Use $route-new-project to choose a location for this new project."
