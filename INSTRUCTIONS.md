@@ -15,6 +15,7 @@ These are common instructions for agents across all scenarios
 - When the user asks for implementation, carry it through implementation, verification, and handoff. Make reasonable low-risk assumptions; ask for guidance only when ambiguity materially changes scope or risk. Surface disagreements and explain them.
 - When a breaking change is intentional, clean up obsolete adjacent code instead of preserving compatibility solely to avoid churn.
 - After changing the global agent instructions or personally maintained skills in `/home/rkth/agents`, validate the changes, commit them, and push the current branch unless the user explicitly asks not to.
+- For authorized GitHub operations, source `/home/rkth/agents/.env.local` to load `GH_TOKEN`. Treat the file and variable as secrets: never display, log, commit, or include their values in project artifacts.
 
 ## Code Taste
 
