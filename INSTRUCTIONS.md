@@ -17,6 +17,7 @@ These are common instructions for agents across all scenarios
 - When waiting for a long-running command, workflow, or other routine operation, use a cheap status check at a fitting interval instead of repeatedly inspecting it. Choose an initial delay and subsequent interval based on the expected duration (for example, wait five minutes before the first check, then check every minute). Investigate logs or other details only when a status check shows failure, an unexpected state, or an unusually long run.
 - After changing the global agent instructions or personally maintained skills in `/home/rkth/agents`, validate the changes, commit them, and push the current branch unless the user explicitly asks not to.
 - For authorized GitHub operations, source `/home/rkth/agents/.env.local` to load `GH_TOKEN`. Treat the file and variable as secrets: never display, log, commit, or include their values in project artifacts.
+- For Kube Kraken repositories, source `/home/rkth/agents/.env.kube-kraken` to load the repository-scoped `GH_TOKEN`; keep this file local, ignored, and out of project artifacts.
 
 ## Code Taste
 
