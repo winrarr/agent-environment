@@ -16,7 +16,7 @@ These are common instructions for agents across all scenarios
 - When a breaking change is intentional, clean up obsolete adjacent code instead of preserving compatibility solely to avoid churn.
 - When waiting for a long-running command, workflow, or other routine operation, use a cheap status check at a fitting interval instead of repeatedly inspecting it. Choose an initial delay and subsequent interval based on the expected duration (for example, wait five minutes before the first check, then check every minute). Investigate logs or other details only when a status check shows failure, an unexpected state, or an unusually long run.
 - After changing the global agent instructions or personally maintained skills in `/home/rkth/agents`, validate the changes, commit them, and push the current branch unless the user explicitly asks not to.
-- Repository-specific GitHub tokens are stored in `/home/rkth/agents/.env/`; consult its local `README.md` for the repository-to-file mapping, then source the appropriate file before authorized GitHub operations. Treat the directory, files, and variables as secrets: never display, log, commit, or include their values in project artifacts.
+- Repository-specific GitHub tokens are stored in `/home/rkth/agents/.env/`; consult its local `README.md` for repository-specific usage before authorized GitHub operations. Treat the directory and its contents as secrets: never display, log, commit, or include their values in project artifacts.
 
 ## Code Taste
 
