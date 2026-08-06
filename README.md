@@ -5,7 +5,6 @@ This repository is the canonical source for personal instructions and authored s
 ## Contents
 
 - `INSTRUCTIONS.md` contains the global instructions used by Codex and Claude Code.
-- `OPINIONS.md` contains optional preferences that are not part of the global instruction set.
 - `skills/` contains personally maintained skills. Third-party and tool-managed skills do not belong here.
 - `install` exposes the canonical files in each tool's expected configuration directory.
 - `check` validates the repository and the installed links.
