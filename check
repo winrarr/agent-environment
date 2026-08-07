@@ -62,6 +62,10 @@ check_skill() {
   done
 }
 
+if [[ ! -s "$repo_dir/AGENTS.md" ]]; then
+  error "missing or empty $repo_dir/AGENTS.md"
+fi
+
 if [[ ! -s "$repo_dir/INSTRUCTIONS.md" ]]; then
   error "missing or empty $repo_dir/INSTRUCTIONS.md"
 fi
