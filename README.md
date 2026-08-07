@@ -5,7 +5,7 @@ This repository is the canonical source for personal instructions and authored s
 ## Contents
 
 - `AGENTS.md` contains repository-local maintenance instructions for working on this repository.
-- `INSTRUCTIONS.md` contains the global instructions used by Codex and Claude Code.
+- `global-instructions.md` contains the global instructions used by Codex and Claude Code.
 - `skills/` contains personally maintained skills. Third-party and tool-managed skills do not belong here.
 - `install` exposes the canonical files in each tool's expected configuration directory.
 - `check` validates the repository and the installed links.

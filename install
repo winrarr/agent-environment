@@ -52,11 +52,11 @@ install_claude_skill() {
   done
 }
 
-[[ -s "$repo_dir/INSTRUCTIONS.md" ]] || fail "missing or empty INSTRUCTIONS.md"
+[[ -s "$repo_dir/global-instructions.md" ]] || fail "missing or empty global-instructions.md"
 [[ -d "$repo_dir/skills" ]] || fail "missing skills directory"
 
-ensure_link "$repo_dir/INSTRUCTIONS.md" "$codex_home/AGENTS.md"
-ensure_link "$repo_dir/INSTRUCTIONS.md" "$claude_home/CLAUDE.md"
+ensure_link "$repo_dir/global-instructions.md" "$codex_home/AGENTS.md"
+ensure_link "$repo_dir/global-instructions.md" "$claude_home/CLAUDE.md"
 
 shopt -s nullglob
 for skill_dir in "$repo_dir"/skills/*; do

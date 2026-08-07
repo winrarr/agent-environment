@@ -1,4 +1,4 @@
-# INSTRUCTIONS.md
+# Global instructions
 
 These are common instructions for agents across all scenarios
 

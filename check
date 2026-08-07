@@ -66,12 +66,12 @@ if [[ ! -s "$repo_dir/AGENTS.md" ]]; then
   error "missing or empty $repo_dir/AGENTS.md"
 fi
 
-if [[ ! -s "$repo_dir/INSTRUCTIONS.md" ]]; then
-  error "missing or empty $repo_dir/INSTRUCTIONS.md"
+if [[ ! -s "$repo_dir/global-instructions.md" ]]; then
+  error "missing or empty $repo_dir/global-instructions.md"
 fi
 
-check_link "$repo_dir/INSTRUCTIONS.md" "$codex_home/AGENTS.md"
-check_link "$repo_dir/INSTRUCTIONS.md" "$claude_home/CLAUDE.md"
+check_link "$repo_dir/global-instructions.md" "$codex_home/AGENTS.md"
+check_link "$repo_dir/global-instructions.md" "$claude_home/CLAUDE.md"
 
 while IFS= read -r broken_link; do
   error "broken repository symlink: $broken_link"
