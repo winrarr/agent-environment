@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repository GitHub Authentication"
+  short_description: "Load scoped credentials for GitHub work."
+  default_prompt: "Use $github-repository-auth to prepare credentials for this authorized GitHub operation."
