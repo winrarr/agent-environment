@@ -1,0 +1,4 @@
+interface:
+  display_name: "User Story Design"
+  short_description: "Map stories to future-ready designs"
+  default_prompt: "Use $user-story-design to generate current and future user stories and compare designs against them."
