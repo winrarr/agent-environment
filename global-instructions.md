@@ -19,7 +19,8 @@
 Write code so its correctness is evident from its structure, not from tracing every possible path.
 
 - Handle invalid and exceptional cases first, with early returns; keep the happy path and control flow flat with minimal nesting.
-- Keep complexity in the domain model rather than the control flow. Model the domain fully; do not undermodel it for simplicity or control-flow convenience.
+- Keep complexity in the domain model rather than the control flow. Design with the full domain model in mind, even when implementing only a slice.
+- Implement only the needed slice when appropriate, provided its design supports extending it to the rest of the domain later; do not simplify the domain model for short-term or control-flow convenience.
 - Do not add abstractions or indirection until there is a second real use.
 - Keep each function at one level of abstraction and give it one responsibility; separate orchestration from low-level detail.
 - Place logic where it naturally belongs; let the code structure mirror the problem.
