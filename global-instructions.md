@@ -16,7 +16,6 @@ These are common instructions for agents across all scenarios
 - When the user asks for implementation, carry it through implementation, verification, and handoff. Make reasonable low-risk assumptions; ask for guidance only when ambiguity materially changes scope or risk. Surface disagreements and explain them.
 - When a breaking change is intentional, clean up obsolete adjacent code instead of preserving compatibility solely to avoid churn.
 - When waiting for a long-running command, workflow, or other routine operation, use a cheap status check at a fitting interval instead of repeatedly inspecting it. Choose an initial delay and subsequent interval based on the expected duration (for example, wait five minutes before the first check, then check every minute). Investigate logs or other details only when a status check shows failure, an unexpected state, or an unusually long run.
-- After changing the global agent instructions or personally maintained skills in this repository, validate the changes, commit them, and push the current branch unless the user explicitly asks not to.
 
 ## Code Taste
 

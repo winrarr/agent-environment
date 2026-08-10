@@ -21,3 +21,5 @@ Run both commands after changing instructions, skills, the installer, or the che
 ## Maintenance
 
 Keep global guidance in `global-instructions.md`, repository-specific guidance here, and specialized reusable workflows in skills. Inspect the final diff for accidental credential or generated-state changes before committing.
+
+After changing the global agent instructions or personally maintained skills in this repository, validate the changes, commit them, and push the current branch unless the user explicitly asks not to.
