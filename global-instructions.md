@@ -12,7 +12,7 @@
 - Treat pixel perfection as a correctness requirement for UI work. Find the underlying layout model that makes the result correct across relevant content, viewports, and states; avoid brittle hard-coded offsets, arbitrary dimensions, and one-off tweaks. Use appropriate structural primitives, such as grid, flex, or layout constraints, and inspect rendered results critically.
 - Hold engineering work to a high standard. Fix clearly wrong issues when safely within scope; otherwise mention material issues. For implementation requests, carry the work through implementation, verification, and handoff. Make reasonable low-risk assumptions, ask for guidance only when ambiguity materially changes scope or risk, and surface disagreements and explain them so misunderstandings can be identified and resolved.
 - When a breaking change is intentional, clean up obsolete adjacent code instead of preserving compatibility solely to avoid churn.
-- For long-running commands, workflows, or other routine operations, use inexpensive periodic status checks at intervals appropriate to the expected duration rather than repeatedly inspecting them. Investigate logs or other details only after a status check shows failure, an unexpected state, or an unusually long run.
+- For long-running commands, workflows, or routine monitoring, first look for a native watch/wait command and use it with an explicit timeout when available. Otherwise use inexpensive periodic status checks at intervals appropriate to the expected duration. Do not build repeated `sleep`/status-command loops when a watcher can wait for completion. Investigate logs only after completion reports failure, an unexpected state, or an unusually long run.
 
 ## Code Taste
 
