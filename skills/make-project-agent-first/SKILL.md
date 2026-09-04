@@ -48,11 +48,12 @@ Evaluate completeness by capability rather than file count. Ensure that an unfam
 
 1. Orient itself to the product, repository shape, and important boundaries.
 2. Find authoritative sources and distinguish source from generated or derived output.
-3. Understand real constraints and recognize changes with a wide blast radius.
-4. Locate implementation, tests, operational knowledge, and rationale predictably.
-5. Run, format, test, build, generate, and validate the project through canonical commands.
-6. See the same important checks enforced in CI or the project's equivalent automation when such automation is relevant.
-7. Keep the foundation accurate as the project evolves.
+3. Find research evidence and distinguish sourced findings, inferences, hypotheses, and accepted decisions.
+4. Understand real constraints and recognize changes with a wide blast radius.
+5. Locate implementation, tests, operational knowledge, and rationale predictably.
+6. Run, format, test, build, generate, and validate the project through canonical commands.
+7. See the same important checks enforced in CI or the project's equivalent automation when such automation is relevant.
+8. Keep the foundation accurate as the project evolves.
 
 ## Investigate Before Writing
 
@@ -60,12 +61,16 @@ For an existing repository, inspect at least:
 
 - root and nested instruction files;
 - README and current documentation;
+- product briefs or product-fit notes describing intended users, workflows, non-goals, or validation criteria;
+- active design proposals and implementation plans, separate from accepted decisions;
 - repository status and relevant history;
 - package manifests, lockfiles, task runners, scripts, and toolchain pins;
 - tests, formatters, linters, build commands, generators, and migrations;
 - CI, deployment, release, and environment configuration;
 - ignored files, secret handling, generated directories, and scratch output;
 - component boundaries and source-of-truth relationships;
+- existing research notes, external references, competitor behavior, and evidence used to guide design;
+- contributor policy, verification and evidence guidance, deployment runbooks, and recovery or upgrade procedures;
 - existing local skills, hooks, commands, and tool-specific adapters.
 
 Prefer executable evidence over prose when they disagree. Preserve unrelated work in a dirty worktree.
@@ -88,7 +93,7 @@ Always provide the capabilities of:
 - repository hygiene for actual generated output, local state, and secrets;
 - tests and checks proportionate to the requested behavior and risk.
 
-Add architecture overviews, ADRs, constraints, backlogs, tech-debt registers, nested instructions, repo-local skills, generated-code guards, hooks, CI, security guidance, or release documentation only when the relevance test passes.
+Add product briefs, architecture overviews, research notes, design proposals or implementation plans, ADRs, constraints, backlogs, tech-debt registers, nested instructions, repo-local skills, generated-code guards, hooks, CI, security guidance, contributor guides, verification or evidence guides, operational runbooks, or release documentation only when the relevance test passes.
 
 ## Write Effective Instructions
 
@@ -146,7 +151,7 @@ Report:
 - the runnable project behavior created or preserved;
 - the agent-first capabilities established;
 - conditional artifacts added and the concrete reason each was relevant;
+- research performed, its evidence boundaries, and how it informed design without becoming an unrecorded decision;
 - conditional artifacts deliberately omitted when their absence may be surprising;
 - verification performed and what it proves;
 - unresolved user-owned decisions, without filling them with invented defaults.
-

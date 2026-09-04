@@ -11,7 +11,9 @@ Include only durable, project-specific operating knowledge:
 - project-specific autonomy or approval boundaries keyed to impact;
 - non-obvious engineering and testing principles;
 - canonical commands and what they cover;
-- pointers to architecture, constraints, decisions, operational workflows, planned work, and known debt that actually exist;
+- pointers to product direction, architecture, constraints, decisions, active design work, operational workflows, planned work, and known debt that actually exist;
+- pointers to research notes when source-backed investigations materially guide design;
+- pointers to verification or evidence guidance and contributor policy when those are separate durable contracts;
 - a maintenance rule explaining where future knowledge belongs.
 
 Do not include:
@@ -64,12 +66,17 @@ Keep instructions synchronized with automation. Prefer CI calling repository scr
 Give future agents a compact routing rule. For example:
 
 - revise commands in place when automation changes;
+- capture product promises, non-goals, and validation criteria in the product brief or product-fit note;
 - record consequential rationale as a decision;
 - record external facts and standing guardrails as constraints;
+- record source-backed investigations in the repository's research area, linking them from the relevant design documents;
+- keep unsettled alternatives and staged implementation plans in the design area until an accepted choice moves to an ADR;
+- keep test, benchmark, and measurement interpretation in the verification or evidence guide;
+- keep shared human contribution rules in the contributor guide;
+- keep deployment, migration, recovery, and upgrade procedures beside the relevant operational artifact;
 - keep implementation detail in code and tests;
 - create a repo-local skill for a repeated specialized workflow;
 - record only real planned outcomes or intentionally unresolved debt;
 - remove stale guidance rather than appending exceptions.
 
 Do not link files that do not exist. Create a conditional artifact when its first real entry appears.
-
