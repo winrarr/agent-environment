@@ -1,25 +1,33 @@
 ---
 name: github-repository-auth
-description: Prepare repository-scoped local credentials for authorized GitHub operations. Use when authenticated gh CLI commands, GitHub API requests, pull requests, issues, repository administration, or publishing changes require a token from this environment's .env directory.
+description: Select repository-appropriate authentication for authorized GitHub operations. Use the default gh CLI authentication for Winrarr repositories; use a local .env token only for other repository scopes listed in the credential mapping.
 ---
 
 # Repository GitHub Authentication
 
-Use this workflow before any authorized GitHub operation that needs authentication.
+Determine the GitHub owner of the target repository from its remote before choosing credentials.
 
-## Locate the credentials
+## Choose authentication by repository owner
 
-1. Identify the repository being operated on from its Git remote and determine its organization or repository scope.
-2. Locate the checkout that contains this skill's `skills/github-repository-auth/SKILL.md`. The credential directory is `.env/` at that checkout's root, not in the target repository.
-3. Read that checkout's `.env/README.md` and follow its scope-to-file mapping. Do not guess which environment file applies.
+### Winrarr repositories
 
-## Load and use a token
+For repositories owned by `Winrarr`, use the existing default `gh` CLI authentication. Run `gh` normally without sourcing a local environment file or overriding its authentication with a token from `.env`.
 
-Load the selected environment file and run the authenticated command in the same shell:
+If you need to check which account the CLI will use, run `gh auth status --hostname github.com`.
+
+### Other repository owners
+
+For any other owner, resolve `~/.codex/AGENTS.md` and use the `.env/README.md` beside its resolved target as the credential mapping. The `.env/` directory beside that target is the credential directory; do not derive its location from this skill or the target repository. If `~/.codex/AGENTS.md` cannot be resolved, report that the credential mapping cannot be located rather than searching other checkouts.
+
+Use an environment file only when the mapping has an exact matching scope. If there is no matching entry, do not guess; report that no credential mapping is defined.
+
+Load the mapped environment file and run the authenticated command in the same shell:
 
 ```bash
+global_instructions_file=$(realpath "$HOME/.codex/AGENTS.md")
+credentials_dir="$(dirname "$global_instructions_file")/.env"
 set -a
-source /path/to/agent-environment/.env/.env.<scope>
+source "$credentials_dir/.env.<scope>"
 set +a
 gh <authorized-command>
 ```
