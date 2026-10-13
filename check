@@ -4,7 +4,12 @@ set -u
 repo_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 codex_home="${CODEX_HOME:-${HOME:?HOME is required}/.codex}"
 claude_home="${CLAUDE_HOME:-${HOME:?HOME is required}/.claude}"
+copilot_home="${COPILOT_HOME:-${HOME:?HOME is required}/.copilot}"
 errors=0
+
+source "$repo_dir/lib/selection.sh"
+parse_selection_args check "$@"
+resolve_skill_dirs check "$repo_dir"
 
 error() {
   printf 'check: %s\n' "$1" >&2
@@ -53,13 +58,19 @@ check_skill() {
     error "$skill_dir/SKILL.md has no description"
   fi
 
-  check_link "$skill_dir" "$codex_home/skills/$skill_name"
-
-  for entry in SKILL.md references scripts assets; do
-    if [[ -e "$skill_dir/$entry" ]]; then
-      check_link "$skill_dir/$entry" "$claude_home/skills/$skill_name/$entry"
-    fi
-  done
+  if [[ " ${agents[*]} " == *" codex "* ]]; then
+    check_link "$skill_dir" "$codex_home/skills/$skill_name"
+  fi
+  if [[ " ${agents[*]} " == *" claude "* ]]; then
+    for entry in SKILL.md references scripts assets; do
+      if [[ -e "$skill_dir/$entry" ]]; then
+        check_link "$skill_dir/$entry" "$claude_home/skills/$skill_name/$entry"
+      fi
+    done
+  fi
+  if [[ " ${agents[*]} " == *" copilot "* ]]; then
+    check_link "$skill_dir" "$copilot_home/skills/$skill_name"
+  fi
 }
 
 if [[ ! -s "$repo_dir/AGENTS.md" ]]; then
@@ -70,20 +81,24 @@ if [[ ! -s "$repo_dir/global-instructions.md" ]]; then
   error "missing or empty $repo_dir/global-instructions.md"
 fi
 
-check_link "$repo_dir/global-instructions.md" "$codex_home/AGENTS.md"
-check_link "$repo_dir/global-instructions.md" "$claude_home/CLAUDE.md"
+if [[ " ${agents[*]} " == *" codex "* ]]; then
+  check_link "$repo_dir/global-instructions.md" "$codex_home/AGENTS.md"
+fi
+if [[ " ${agents[*]} " == *" claude "* ]]; then
+  check_link "$repo_dir/global-instructions.md" "$claude_home/CLAUDE.md"
+fi
+if [[ " ${agents[*]} " == *" copilot "* ]]; then
+  check_link "$repo_dir/global-instructions.md" "$copilot_home/copilot-instructions.md"
+fi
 
 while IFS= read -r broken_link; do
   error "broken repository symlink: $broken_link"
 done < <(find "$repo_dir" -xtype l -print)
 
-shopt -s nullglob
-skill_dirs=("$repo_dir"/skills/*)
-if (( ${#skill_dirs[@]} == 0 )); then
+if (( ${#selected_skill_dirs[@]} == 0 )); then
   error "no skills found in $repo_dir/skills"
 else
-  for skill_dir in "${skill_dirs[@]}"; do
-    [[ -d "$skill_dir" ]] || continue
+  for skill_dir in "${selected_skill_dirs[@]}"; do
     check_skill "$skill_dir"
   done
 fi
@@ -93,4 +108,4 @@ if (( errors > 0 )); then
   exit 1
 fi
 
-printf 'Agent environment is valid and installed.\n'
+printf 'Selected agent environment is valid and installed.\n'
