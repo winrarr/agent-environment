@@ -4,14 +4,16 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
 
 
-LINK_RE = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
+# Multi-platform manifest digest for lycheeverse/lychee:0.24.2.
+LYCHEE_IMAGE = "lycheeverse/lychee@sha256:e2d19e57cf6ab037026f20b8e449a1f30d9d7f81eef4194763aab2eab20bd28d"
 PLACEHOLDER_RE = re.compile(
     r"(?:\[TODO[^\]]*\]|\bTODO\s*:|\bTBD\b|\bCHANGEME\b|<project[-_ ]?name>)",
     re.IGNORECASE,
@@ -92,40 +94,98 @@ def validate_placeholders(root: Path) -> list[Finding]:
     return findings
 
 
-def link_target(raw_target: str) -> str:
-    target = raw_target.strip()
-    if target.startswith("<") and target.endswith(">"):
-        target = target[1:-1]
-    return target.split(maxsplit=1)[0]
-
-
 def validate_links(root: Path) -> list[Finding]:
+    files = markdown_files(root)
+    if not files:
+        return []
+
+    project_mount = Path("/project")
+    input_paths = "\n".join(path.relative_to(root).as_posix() for path in files) + "\n"
+    command = [
+        "docker",
+        "run",
+        "--rm",
+        "--interactive",
+        "--network",
+        "none",
+        "--mount",
+        f"type=bind,source={root},target={project_mount},readonly",
+        "--workdir",
+        str(project_mount),
+        LYCHEE_IMAGE,
+        "--offline",
+        "--no-progress",
+        "--format",
+        "json",
+        "--files-from",
+        "-",
+    ]
+    try:
+        result = subprocess.run(
+            command,
+            input=input_paths,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+    except OSError as error:
+        return [Finding("ERROR", root, f"could not start the Docker-based Markdown link checker: {error}")]
+
+    try:
+        report = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        detail = result.stderr.strip() or result.stdout.strip() or "no diagnostic output"
+        return [Finding("ERROR", root, f"Markdown link checker failed to return JSON: {detail}")]
+
+    error_map = report.get("error_map")
+    if not isinstance(error_map, dict):
+        return [Finding("ERROR", root, "Markdown link checker returned an invalid JSON report")]
+
     findings: list[Finding] = []
-    for path in markdown_files(root):
-        text = path.read_text(encoding="utf-8")
+    for reported_path, link_errors in error_map.items():
+        source = Path(reported_path)
+        if source.is_absolute():
+            try:
+                source = source.relative_to(project_mount)
+            except ValueError:
+                findings.append(Finding("ERROR", root, f"link checker reported a source outside the project: {reported_path}"))
+                continue
+        source_path = (root / source).resolve()
+        try:
+            source_path.relative_to(root)
+        except ValueError:
+            findings.append(Finding("ERROR", root, f"link checker reported a source outside the project: {reported_path}"))
+            continue
+
+        if not isinstance(link_errors, list):
+            findings.append(Finding("ERROR", source_path, "link checker returned malformed link errors"))
+            continue
+
         seen_targets: set[str] = set()
-        for raw_target in LINK_RE.findall(text):
-            target = link_target(raw_target)
+        for link_error in link_errors:
+            if not isinstance(link_error, dict) or not isinstance(link_error.get("url"), str):
+                findings.append(Finding("ERROR", source_path, "link checker returned a malformed link error"))
+                continue
+            target = link_error["url"]
             if target in seen_targets:
                 continue
             seen_targets.add(target)
-            parsed = urlsplit(target)
-            if parsed.scheme or target.startswith(("#", "mailto:")):
-                continue
-            relative = unquote(parsed.path)
-            if not relative:
-                continue
-            if relative.startswith("/"):
-                findings.append(Finding("WARN", path, f"non-portable absolute local link: {target}"))
-                continue
-            resolved = (path.parent / relative).resolve()
-            try:
-                resolved.relative_to(root.resolve())
-            except ValueError:
-                findings.append(Finding("WARN", path, f"local link leaves project root: {target}"))
-                continue
-            if not resolved.exists():
-                findings.append(Finding("ERROR", path, f"broken local link: {target}"))
+
+            span = link_error.get("span")
+            if isinstance(span, dict) and isinstance(span.get("line"), int):
+                location = f"line {span['line']}: "
+            else:
+                location = ""
+            status = link_error.get("status")
+            detail = status.get("text") if isinstance(status, dict) else None
+            message = f"{location}broken local link: {target}"
+            if isinstance(detail, str) and detail:
+                message += f" ({detail})"
+            findings.append(Finding("ERROR", source_path, message))
+
+    if result.returncode != 0 and not findings:
+        detail = result.stderr.strip() or f"exit status {result.returncode}"
+        findings.append(Finding("ERROR", root, f"Markdown link checker failed: {detail}"))
     return findings
 
 

@@ -140,6 +140,8 @@ Run checks proportionate to the work, including:
 python3 <skill-directory>/scripts/validate_foundation.py <project-root>
 ```
 
+The validator uses the pinned official [Lychee Docker image](https://hub.docker.com/r/lycheeverse/lychee) for offline Markdown link checking; Docker is required, and fenced/inline code examples are excluded from link extraction. Link checks run with container networking disabled.
+
 Treat validator warnings as prompts for judgment, not automatic reasons to add irrelevant files. Fix all errors. Resolve each warning by improving the project or confirming that the capability is intentionally satisfied another way.
 
 Inspect the final diff for accidental duplication, placeholders, stale paths, and unrelated changes. For an audit-only request, run non-mutating checks and report findings rather than editing.
