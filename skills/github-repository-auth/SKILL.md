@@ -15,7 +15,7 @@ When the user has not specified a credential, apply these repository mappings be
 
 - Repositories owned by `Winrarr`: use `gh`'s existing authentication by default.
 - Repositories owned by Kube Kraken: use `~/agents/.env/.env.kube-kraken`.
-- The Harbor Operator project/repository: use `~/agents/.env/.env.kube-kraken-harbor-operator`. This specific mapping takes precedence over the general Kube Kraken mapping.
+- Operations targeting the repository in `~/Documents/work/dev/harbor-operator`: use `~/agents/.env/.env.kube-kraken-harbor-operator`. Match this specific checkout path, resolving symlinks if needed; do not apply the exception based on a repository name alone. This path-specific mapping takes precedence over the general Kube Kraken mapping.
 
 For other targets, consult the credential guide at `.env/README.md` beside the resolved `~/.codex/AGENTS.md`, if available. Treat it as a helpful, non-exhaustive guide: use the target host, owner, repository scope, and token descriptions to select a suitable credential, preferring the narrowest applicable scope. Do not require an exact scope match or refuse solely because the guide is missing, incomplete, or does not list a path the user explicitly provided.
 
