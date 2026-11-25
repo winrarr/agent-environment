@@ -7,6 +7,12 @@ description: Select and safely retry the right authentication for authorized Git
 
 Choose credentials for the repository the operation actually targets, not merely the current checkout. Use an explicit `OWNER/REPO` target when given; otherwise inspect the relevant Git remote. Normalize owner names case-insensitively and account for SSH, HTTPS, and configured GitHub hosts. In a checkout with multiple remotes, use the remote for the target of the operation. Do not infer the owner from a directory name. If the target remains ambiguous, ask before using credentials.
 
+## Choose the client for the operation
+
+Use the client that performs the requested operation. For Git transport operations such as `git push`, `git pull`, `git fetch`, or `git clone`, run the corresponding plain `git` command first. Let Git use its configured SSH agent/key, credential helper, or askpass mechanism. Do not replace a Git command with `gh`, and do not ask the user to authenticate `gh` just because the GitHub CLI is not authenticated.
+
+The repository credential mappings below select credentials for GitHub API operations, especially `gh` commands such as viewing or creating pull requests. They do not imply that Git transport uses `GH_TOKEN`, or that `gh auth status` predicts whether `git push` will work. For a Git transport authentication failure, inspect the target remote's URL and transport, then diagnose the corresponding SSH or Git credential-helper setup. Only use an environment-file token if the user explicitly selected it or the configured Git transport can consume it. Ask the user only if the relevant Git transport authentication is actually unavailable after those checks.
+
 ## Select authentication
 
 Follow an explicit user preference for a credential when it is available and the operation is authorized. This includes a user-selected token or credential file outside the usual `.env/` directory; do not reject it solely because of its location or because a mapping suggests a different default.
@@ -24,9 +30,9 @@ When checking configured `gh` authentication, use `gh auth status --hostname <ta
 
 ## Retry authentication failures
 
-If the selected credential is rejected or cannot access the target, try the next plausible credential file in `~/agents/.env` based on its filename and the credential guide, one at a time, until the authorized operation succeeds or no reasonable candidate remains. This applies after trying the mapped credential too. For Winrarr, start with existing `gh` authentication. Do not ask the user to select among locally available candidates before trying them.
+For GitHub API operations, if the selected credential is rejected or cannot access the target, try the next plausible credential file in `~/agents/.env` based on its filename and the credential guide, one at a time, until the authorized operation succeeds or no reasonable candidate remains. This applies after trying the mapped credential too. For Winrarr, start with existing `gh` authentication. Do not ask the user to select among locally available candidates before trying them. This API credential retry process does not replace Git's configured transport authentication for `git push`, `git pull`, `git fetch`, or `git clone`.
 
-Retry only for an authentication or access failure, such as invalid credentials, permission denied, or a private repository reported as not found. Do not rotate credentials for unrelated errors such as a malformed PR number, network failure, or rate limit. Skip missing or malformed candidate files and continue with other plausible candidates. Stop after the first successful operation. If all reasonable candidates fail or the target or mapping is genuinely unclear, tell the user what failed and ask only for the missing access or direction; do not keep guessing.
+For these API retries, retry only on an authentication or access failure, such as invalid credentials, permission denied, or a private repository reported as not found. Do not rotate credentials for unrelated errors such as a malformed PR number, network failure, or rate limit. Skip missing or malformed candidate files and continue with other plausible candidates. Stop after the first successful operation. If all reasonable candidates fail or the target or mapping is genuinely unclear, tell the user what failed and ask only for the missing access or direction; do not keep guessing.
 
 ## Use credentials safely
 
